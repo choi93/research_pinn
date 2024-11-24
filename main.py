@@ -2,7 +2,7 @@ import os
 import hydra
 from omegaconf import DictConfig
 
-from wavepinn.trainer import PINNTrainer
+from wavepinn.pinnTrainer import PINNTrainer
 
 @hydra.main(version_base="1.3", config_path="config", config_name="input_training")
 def main(cfg: DictConfig):

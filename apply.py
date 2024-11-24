@@ -1,7 +1,7 @@
 import os
 from omegaconf import DictConfig
 import hydra
-from wavepinn.trainer import PINNTrainer
+from wavepinn.pinnTrainer import PINNTrainer
 
 os.environ['CUDA_VISIBLE_DEVICES']='3'
 
