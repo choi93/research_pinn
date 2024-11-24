@@ -1,0 +1,17 @@
+domain:  
+  nt: 21
+  nx: 751
+  nz: 751
+  x_min: -1.0
+  x_max: 1.0
+  z_min: -1.0
+  z_max: 1.0
+  t_min: 0.0
+  t_max: 0.04
+apply:
+  batch_size: 10000
+  debug: True
+  checkpoint_number: 100
+paths:
+  trained_model: './save_pinn/'
+  result_dir: './result_pinn/'

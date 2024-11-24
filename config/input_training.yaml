@@ -1,0 +1,45 @@
+defaults:
+  - _self_
+
+data_config: 'config/input_data.yaml'
+
+training:
+  learning_rate: 1.0e-5
+  batch_size: 100
+  n_epochs: 1000
+  physics_weight: 1.0
+  wave_speed: 2.5
+  boundary_condition:
+    steps: 100
+    sample_size: 5000
+    weight: 1.0
+  physics_informed:
+    enabled: true
+    sample_size: 5000
+    steps: 5000
+    max_training_time: 0.2
+    loss_balance: 0.000001
+  initial_condition:
+    weight: 1.0
+  optimizer:
+    type: 'adam'
+    loss: 'mse'
+    metrics: null
+  checkpointing:
+    save: true
+    save_dir: './save_pinn/'
+    load: false
+    load_dir: './save_pinn/'
+  logging:
+    log_dir: './logs/'
+    save_frequency: 100
+    checkpoint_frequency: 100
+
+model:
+  input_dim: 3
+  n_layers: 8
+  n_units: 256
+  output_dim: 1
+  output_activation: 'linear'
+  activation: 'sine'
+  kernel_initializer: null
