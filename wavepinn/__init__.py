@@ -1,4 +1,4 @@
-from .trainer import PINNTrainer
+from .pinnTrainer import PINNTrainer
 from .model_pinn import WaveNet
 from .utils.data_preproc import Wave2DDataGenerator
 from .losses import PhysicsLoss
