@@ -13,5 +13,5 @@ def main(cfg: DictConfig):
 if __name__ == "__main__":
     os.environ['TF_ENABLE_ONEDNN_OPTS']='0'
     os.environ['TF_FORCE_GPU_ALLOW_GROWTH']='true'
-    os.environ['CUDA_VISIBLE_DEVICES']='0'
+    os.environ['CUDA_VISIBLE_DEVICES']='1'
     main()

@@ -28,4 +28,4 @@ class PhysicsLoss:
 
     def __call__(self, model, txz):
         residual = self.compute_wave_residual(model, txz)
-        return tf.reduce_mean(tf.abs(residual))
+        return tf.reduce_mean(tf.square(residual))

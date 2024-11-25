@@ -8,7 +8,7 @@ import yaml
 
 
 from .model_pinn import WaveNet
-from .utils.data_preproc import Wave2DDataGenerator
+from .utils.data_preproc import Wave2DDataGenerator, create_coordinate_grid
 from .utils.module_io import createFolder, to_bin
 from .losses import PhysicsLoss
 
@@ -32,8 +32,6 @@ class PINNTrainer:
         if self.task == 'train':
             # Training state
             self.iter_count = 0
-            self.minimum_loss = float('inf')
-            self.best_model = None
             self.loss_balance = tf.cast(self.cfg.training.physics_informed.loss_balance, tf.float32)
         
             # Setup logging
@@ -146,6 +144,7 @@ class PINNTrainer:
                 current_time = dt * (time_step + 1)
                 
                 for step in range(self.cfg.training.physics_informed.steps):
+                    whole_step = time_step * self.cfg.training.physics_informed.steps + step + self.cfg.training.boundary_condition.steps
                     # 경계 데이터 샘플링
                     idx = np.random.choice(len(txz_boundary), self.cfg.training.physics_informed.sample_size)
                     txz_batch = txz_boundary[idx]
@@ -160,7 +159,7 @@ class PINNTrainer:
                     loss, physics_loss, boundary_loss = self.pinn_step(
                         txz_batch, u_batch, txz_collocation)
                     
-                    self.log_progress(loss, step, physics_loss, boundary_loss, 
+                    self.log_progress(loss, whole_step, physics_loss, boundary_loss, 
                                     training_phase="pinn", time_step=time_step)
 
         training_time = time.time() - t0
@@ -174,7 +173,7 @@ class PINNTrainer:
         checkpoint_number = self.checkpoint_number
         self.model.load_weights(f"{model_path}/wave2d_{checkpoint_number}")
 
-        coords = Wave2DDataGenerator.create_coordinate_grid(
+        coords = create_coordinate_grid(
             self.nt, self.nx, self.nz,
             self.t_min, self.t_max,
             self.x_min, self.x_max,
@@ -210,10 +209,6 @@ class PINNTrainer:
                 self.physics_loss_file.write(f"{physics_loss:.6e}\n")
                 self.bc_loss_file.write(f"{boundary_loss:.6e}\n")
             
-            # 최적 모델 저장
-            if loss < self.minimum_loss:
-                self.minimum_loss = loss
-                self.best_model = self.model.get_weights()
 
         # 체크포인트 저장
         if step % self.cfg.training.logging.checkpoint_frequency == 0:

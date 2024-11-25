@@ -53,7 +53,7 @@ class Wave2DDataGenerator:
             - 좌표 데이터: (전체_포인트, 3) 형태로 (t, x, z)
             - 경계값 데이터: (전체_포인트, 1) 형태로 필드값
         """
-        coords = self.create_coordinate_grid(
+        coords = create_coordinate_grid(
             self.n_snapshots, self.nx, self.nz,
             self.t_min, self.t_max,
             self.x_min, self.x_max,
@@ -85,29 +85,7 @@ class Wave2DDataGenerator:
         # 좌표를 단일 배열로 결합
         return np.concatenate([t_col, x_col, z_col], axis=1)
 
-    def create_coordinate_grid(nt: int, nx: int, nz: int,
-                              t_min: float, t_max: float,
-                              x_min: float, x_max: float,
-                              z_min: float, z_max: float) -> npt.NDArray:
-        """메모리 효율적인 브로드캐스팅을 사용하여 정규 좌표 격자 생성
-        
-        Args:
-            nt, nx, nz: 각 차원의 포인트 수
-            t_min, t_max: 시간 도메인 경계
-            x_min, x_max: X축 도메인 경계
-            z_min, z_max: Z축 도메인 경계
-            
-        Returns:
-            NDArray: 좌표 격자점, 형태 (nt*nx*nz, 3)
-        """
-        # 브로드캐스팅을 위한 적절한 차원의 1D 배열 생성
-        t = np.linspace(t_min, t_max, nt)[:, None, None]  # 형태: (nt, 1, 1)
-        x = np.linspace(x_min, x_max, nx)[None, :, None]  # 형태: (1, nx, 1)
-        z = np.linspace(z_min, z_max, nz)[None, None, :]  # 형태: (1, 1, nz)
-        
-        # 브로드캐스팅을 사용하여 전체 좌표 배열 생성
-        coords = np.broadcast_arrays(t, x, z)
-        return np.column_stack([coord.reshape(-1) for coord in coords])
+
 
     def _load_snapshots(self, snapshot_dir: str, time_start: int,
                        n_snapshots: int, nx: int, nz: int) -> npt.NDArray:
@@ -159,3 +137,26 @@ class Wave2DDataGenerator:
             print(f"Error details: {str(e)}")
             raise Exception("Failed to load any snapshot data") from e
 
+def create_coordinate_grid(nt: int, nx: int, nz: int,
+                          t_min: float, t_max: float,
+                          x_min: float, x_max: float,
+                          z_min: float, z_max: float) -> npt.NDArray:
+    """메모리 효율적인 브로드캐스팅을 사용하여 정규 좌표 격자 생성
+        
+    Args:
+        nt, nx, nz: 각 차원의 포인트 수
+        t_min, t_max: 시간 도메인 경계
+        x_min, x_max: X축 도메인 경계
+        z_min, z_max: Z축 도메인 경계
+            
+    Returns:
+        NDArray: 좌표 격자점, 형태 (nt*nx*nz, 3)
+    """
+    # 브로드캐스팅을 위한 적절한 차원의 1D 배열 생성
+    t = np.linspace(t_min, t_max, nt)[:, None, None]  # 형태: (nt, 1, 1)
+    x = np.linspace(x_min, x_max, nx)[None, :, None]  # 형태: (1, nx, 1)
+    z = np.linspace(z_min, z_max, nz)[None, None, :]  # 형태: (1, 1, nz)
+        
+    # 브로드캐스팅을 사용하여 전체 좌표 배열 생성
+    coords = np.broadcast_arrays(t, x, z)
+    return np.column_stack([coord.reshape(-1) for coord in coords])
